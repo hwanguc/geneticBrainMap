@@ -13,6 +13,69 @@ atlas = abagen.fetch_desikan_killiany()
 # get expression data for atlas
 expression = abagen.get_expression_data(atlas['image'],atlas['info'],probe_selection='max_intensity',donor_probes='aggregate')
 
+# --- inputs you already have ---
+# expression: DataFrame (83 x G), index = DK integer IDs, columns = gene symbols
+# atlas: dict with 'image' (NIfTI path to DK labels) and 'info' (CSV path)
+labels_img = nib.load(atlas['image'])
+info = pd.read_csv(atlas['info'])  # id,label,hemisphere,structure
+cort_ids = set(info.loc[info.structure=="cortex","id"].astype(int))
+
+# choose a gene (must be a column in expression)
+gene = "GRIN2A"
+vals = expression[gene]                    # Series indexed by DK IDs (ints)
+valmap = vals.to_dict()                    # {region_id: value}
+
+# fetch fsaverage meshes
+fsavg = datasets.fetch_surf_fsaverage()
+
+def parcel_flat_texture(pial_surf, radius=10.0):
+    """
+    Sample DK integer labels to vertices (nearest, thicker radius),
+    then map each vertex's label -> the single parcel value.
+    """
+    vlabels = surface.vol_to_surf(
+        labels_img, pial_surf, interpolation='nearest', radius=radius
+    )
+    vlabels = np.nan_to_num(vlabels, nan=0.0).astype(int)
+
+    # make one color per region: look up the parcel value; background (0) -> NaN
+    tex = np.full(vlabels.shape, np.nan, dtype=float)
+    # fill only cortical parcels if you want cortex-only plots
+    for rid in np.unique(vlabels):
+        if rid == 0:
+            continue
+        if rid not in cort_ids:           # drop this "if" block to include subcortex
+            continue
+        tex[vlabels == rid] = valmap.get(int(rid), np.nan)
+    return tex
+
+# build textures
+texL = parcel_flat_texture(fsavg.pial_left,  radius=5.0)
+texR = parcel_flat_texture(fsavg.pial_right, radius=5.0)
+
+# plot on inflated surfaces (one solid colour per parcel)
+plotting.plot_surf_stat_map(
+    fsavg.infl_left, texL, hemi="left",  bg_map=fsavg.sulc_left,
+    colorbar=True, title=f"{gene} (left)"
+)
+plotting.plot_surf_stat_map(
+    fsavg.infl_right, texR, hemi="right", bg_map=fsavg.sulc_right,
+    colorbar=True, title=f"{gene} (right)"
+)
+plotting.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
 map = abagen.get_interpolated_map('SNCA',atlas['image'])
 
 
