@@ -11,7 +11,7 @@ def run_synthseg_t1(file, base_output=None):
     
     if not os.path.isfile(output_file):
         # Set up FreeSurfer environment
-        freesurfer_home = "/home/meldstudent/Programmes/FreeSurfer/freesurfer"
+        freesurfer_home = "/usr/local/freesurfer/7.4.1"
         os.environ['FREESURFER_HOME'] = freesurfer_home
         subprocess.check_call(f"source {freesurfer_home}/FreeSurferEnv.sh", shell=True, executable='/bin/bash')
         
@@ -22,21 +22,21 @@ def run_synthseg_t1(file, base_output=None):
 
 
 # Set folder path
-folder = '/home/meldstudent/Documents/RDS_GrowthCharts/bids_data/KANSL1'
-derivatives_folder = os.path.join(folder, 'derivatives', 'synthseg')
+folder = '/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg'
+derivatives_folder = os.path.join(folder, 'output')
 
 # Ensure the derivatives folder exists
 os.makedirs(derivatives_folder, exist_ok=True)
 
 # Get the list of subjects using glob
-subject_dirs = glob.glob(os.path.join(folder, 'sub-*'))
+subject_dirs = glob.glob(os.path.join(folder, 'raw', 'sub-*'))
 #just run on sub-11
 for subject in subject_dirs:
     subject_id = os.path.basename(subject)
     anat_folder = os.path.join(subject, 'anat')
     print(anat_folder)
     if os.path.isdir(anat_folder):
-        nifti_files = glob.glob(os.path.join(anat_folder, '*.nii.gz'))
+        nifti_files = glob.glob(os.path.join(anat_folder, '*.nii'))
         print(nifti_files)
         for nifti_file in nifti_files:
             # Create the output folder for the subject in the derivatives folder
