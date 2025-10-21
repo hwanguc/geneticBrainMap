@@ -22,7 +22,7 @@ def run_synthseg_t1(file, base_output=None):
 
 
 # Set folder path
-folder = '/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg'
+folder = '/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg2'
 derivatives_folder = os.path.join(folder, 'output')
 
 # Ensure the derivatives folder exists
