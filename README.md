@@ -1,6 +1,6 @@
 # geneticBrainMap
 
-This respiratory contains the Python (Jupyter Notebook) and R code for extracting brain volumes using SynthSeg, modelling the brain volume growth curve using [Generalized Additive Models for Location, Scale and Shape](https://www.gamlss.com/), and map gene expressions of post-mortem samples to brain templates using [abagen] (https://abagen.readthedocs.io/en/stable/).
+This respiratory contains the Python (Jupyter Notebook) and R code for extracting brain volumes using SynthSeg, modelling the brain volume growth curve using [Generalized Additive Models for Location, Scale and Shape](https://www.gamlss.com/), and map gene expressions of post-mortem samples to brain templates using [abagen](https://abagen.readthedocs.io/en/stable/).
 
 **./archive/** - Archived files.
 
