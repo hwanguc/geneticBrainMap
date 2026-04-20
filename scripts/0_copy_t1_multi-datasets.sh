@@ -2,9 +2,10 @@
 set -euo pipefail
 
 # Usage:
-#   ./copy_t1s.sh                # defaults to GRIN2A-Aus
-#   ./copy_t1s.sh IXI            # run on IXI batch
-#   ./copy_t1s.sh GRIN2A-Aus     # run on GRIN2A-Aus batch explicitly
+#   ./0_copy_t1_multi-datasets.sh                # defaults to GRIN2A-Aus
+#   ./0_copy_t1_multi-datasets.sh IXI            # run on IXI batch
+#   ./0_copy_t1_multi-datasets.sh KdV            # run on KdV batch
+#   ./0_copy_t1_multi-datasets.sh GRIN2A-Aus     # run on GRIN2A-Aus batch explicitly
 #
 # Notes:
 # - IXI requires MRtrix3's `mrconvert` on PATH.
@@ -12,14 +13,15 @@ set -euo pipefail
 BATCH="${1:-GRIN2A-Aus}"
 
 # ---- Targets (common) ----
-Dir_Target="/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg3/raw"
+
 
 case "$BATCH" in
   "GRIN2A-Aus")
     echo "[INFO] Running GRIN2A-Aus mode"
 
-    # ---- Source ----
+    # ---- Source and Target ----
     Dir_Origin="/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/pre_processing"
+    Dir_Target="/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg3/raw"
 
     # ---- Subject list (edit as needed) ----
     #Subjs=("114" "119" "121" "122" "123" "130" "131" "132" "133" "1690" "0020" "0437" "0903" "0012" "1098" "1117" "1266" "1527" "1572" "1726" "g001" "g002" "g003" "g004" "g005" "g006" "g008" "g010")
@@ -38,8 +40,9 @@ case "$BATCH" in
   "IXI")
     echo "[INFO] Running IXI mode"
 
-    # ---- Source ----
+    # ---- Source and Target----
     Dir_IXI_Raw="$HOME/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/raw_IXI"
+    Dir_Target="/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg3/raw"
 
     # Ensure mrconvert exists
     if ! command -v mrconvert >/dev/null 2>&1; then
@@ -69,10 +72,31 @@ case "$BATCH" in
       mrconvert "$f" "$out_nii" -force
     done
     ;;
+  
+  "KdV")
+    echo "[INFO] Running KdV mode"
+
+    # ---- Source and Target ----
+    Dir_Origin="/home/hanwang/Documents/Data/ucl/gos_ich/kdvproj/pre_processing"
+    Dir_Target="/home/hanwang/Documents/Data/ucl/gos_ich/kdvproj/synthseg/raw"
+
+    # ---- Subject list (edit as needed) ----
+    #Subjs=("114" "119" "121" "122" "123" "130" "131" "132" "133" "1690" "0020" "0437" "0903" "0012" "1098" "1117" "1266" "1527" "1572" "1726" "g001" "g002" "g003" "g004" "g005" "g006" "g008" "g010")
+    Subjs=("113" "114" "115" "116" "117" "121" "123" "126" "127" "128" "k304" "k308" "k309" "k345" "k347" "k373" "k374")
+
+    # Prefix with "sub-"
+    mapfile -t Subjs < <(for Subj in "${Subjs[@]}"; do echo "sub-$Subj"; done)
+
+    for Subj in "${Subjs[@]}"; do
+      echo "[INFO] Copying *.nii for $Subj -> synthseg folder"
+      mkdir -p "$Dir_Target/$Subj/anat"
+      cp "$Dir_Origin/$Subj/anat/"*.nii "$Dir_Target/$Subj/anat/"
+    done
+    ;;
 
   *)
     echo "[ERROR] Unknown batch: $BATCH"
-    echo "Valid options: GRIN2A-Aus | IXI"
+    echo "Valid options: GRIN2A-Aus | IXI | KdV"
     exit 1
     ;;
 esac

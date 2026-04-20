@@ -1,3 +1,11 @@
+# Author: Han Wang
+# Date: 2026-04-20
+# 2026-04-20: Added support for running SynthSeg for GRIN2A and KdV projects
+
+# env variables:
+proj = 'kdvproj'  # or 'kdvproj'
+
+
 import os
 import glob
 import subprocess
@@ -11,7 +19,7 @@ def run_synthseg_t1(file, base_output=None):
     
     if not os.path.isfile(output_file):
         # Set up FreeSurfer environment
-        freesurfer_home = "/usr/local/freesurfer/7.4.1"
+        freesurfer_home = "/usr/local/freesurfer/8.2.0"
         os.environ['FREESURFER_HOME'] = freesurfer_home
         subprocess.check_call(f"source {freesurfer_home}/FreeSurferEnv.sh", shell=True, executable='/bin/bash')
         
@@ -22,7 +30,13 @@ def run_synthseg_t1(file, base_output=None):
 
 
 # Set folder path
-folder = '/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg3'
+
+folder =''
+if proj == 'grin2aproj':
+    folder = '/home/hanwang/Documents/gos_ich/cre_project/Data/data_proc/grin2aproj/synthseg3'
+elif proj == 'kdvproj':
+    folder = '/home/hanwang/Documents/Data/ucl/gos_ich/kdvproj/synthseg'
+
 derivatives_folder = os.path.join(folder, 'output')
 
 # Ensure the derivatives folder exists
