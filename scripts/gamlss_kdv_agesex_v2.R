@@ -369,6 +369,95 @@ plot_mod_left.caudate_95q+
         legend.text = element_text(size=11)) # update the formatting for the plot
 
 
+
+## left caudate (beta)
+
+
+mod_left.caudate.beta <- gamlss(left.caudate.prop ~ fp(Age)*Sex,
+                                sigma.formula = ~ fp(Age)*Sex,
+                                family = BE, 
+                                data = dat_kdv_control,
+                                trace = FALSE,
+                                control = gamlss.control(n.cyc = 200))
+summary(mod_left.caudate.beta)
+
+fittedPlot(mod_left.caudate.beta,x=dat_kdv_control$Age)
+
+
+## plot:
+
+### create a grid for predicted dataframe
+grid_left.caudate.beta <- expand.grid(
+  Age = seq(min(dat_kdv_control$Age, na.rm = TRUE),
+            max(dat_kdv_control$Age, na.rm = TRUE),
+            length.out = 200),
+  Sex = levels(dat_kdv_control$Sex)
+)
+
+### Predicted data
+pa_left.caudate.beta <- predictAll(mod_left.caudate.beta, newdata = grid_left.caudate.beta, type = "response")
+
+### Parameters for plotting
+pred_beta_left.caudate.beta <- data.frame(
+  Age      = grid_left.caudate.beta$Age,
+  Sex      = grid_left.caudate.beta$Sex,
+  mu       = as.numeric(pa_left.caudate.beta$mu),
+  sigma    = as.numeric(pa_left.caudate.beta$sigma)
+)
+
+### Add a calibrated 95% prediction/quantile band for beta
+pred_beta_left.caudate.beta$q_lo <- qBE(0.025, mu = pred_beta_left.caudate.beta$mu, sigma = pred_beta_left.caudate.beta$sigma)
+pred_beta_left.caudate.beta$q_hi <- qBE(0.975, mu = pred_beta_left.caudate.beta$mu, sigma = pred_beta_left.caudate.beta$sigma)
+
+### ±1 SD for beta
+pred_beta_left.caudate.beta$q_lo_1sd <- qBE(0.1586553, mu = pred_beta_left.caudate.beta$mu, sigma = pred_beta_left.caudate.beta$sigma)
+pred_beta_left.caudate.beta$q_hi_1sd <- qBE(0.8413447, mu = pred_beta_left.caudate.beta$mu, sigma = pred_beta_left.caudate.beta$sigma)
+
+
+### SD response
+plot_mod_left.caudate.beta_1sd<-ggplot(dat_kdv_control,aes(x=Age, y=left.caudate.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=left.caudate.prop,colour=Sex)) +
+  geom_line(data=pred_beta_left.caudate.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_left.caudate.beta, aes(ymin=q_lo_1sd, ymax=q_hi_1sd, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "left.caudate volume proportion")+
+  theme_minimal()
+
+
+plot_mod_left.caudate.beta_1sd+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+### 95% response: 95 % prediction / quantile band
+plot_mod_left.caudate.beta_95q<-ggplot(dat_kdv_control,aes(x=Age, y=left.caudate.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=left.caudate.prop,colour=Sex)) +
+  geom_line(data=pred_beta_left.caudate.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_left.caudate.beta, aes(ymin=q_lo, ymax=q_hi, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "left.caudate volume proportion")+
+  theme_minimal()
+
+
+plot_mod_left.caudate.beta_95q+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+
+
+
+
 ## right.caudate
 mod_right.caudate <- gamlss(right.caudate ~ fp(Age)*Sex,
                             sigma.formula = ~ fp(Age)*Sex,
@@ -448,6 +537,91 @@ plot_mod_right.caudate_95q<-ggplot(dat_kdv_control,aes(x=Age, y=right.caudate,co
 
 
 plot_mod_right.caudate_95q+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+
+
+## right.caudate (beta)
+
+mod_right.caudate.beta <- gamlss(right.caudate.prop ~ fp(Age)*Sex,
+                                 sigma.formula = ~ fp(Age)*Sex,
+                                 family = BE, 
+                                 data = dat_kdv_control,
+                                 trace = FALSE,
+                                 control = gamlss.control(n.cyc = 200))
+summary(mod_right.caudate.beta)
+
+fittedPlot(mod_right.caudate.beta,x=dat_kdv_control$Age)
+
+
+## plot:
+
+### create a grid for predicted dataframe
+grid_right.caudate.beta <- expand.grid(
+  Age = seq(min(dat_kdv_control$Age, na.rm = TRUE),
+            max(dat_kdv_control$Age, na.rm = TRUE),
+            length.out = 200),
+  Sex = levels(dat_kdv_control$Sex)
+)
+
+### Predicted data
+pa_right.caudate.beta <- predictAll(mod_right.caudate.beta, newdata = grid_right.caudate.beta, type = "response")
+
+### Parameters for plotting
+pred_beta_right.caudate.beta <- data.frame(
+  Age      = grid_right.caudate.beta$Age,
+  Sex      = grid_right.caudate.beta$Sex,
+  mu       = as.numeric(pa_right.caudate.beta$mu),
+  sigma    = as.numeric(pa_right.caudate.beta$sigma)
+)
+
+### Add a calibrated 95% prediction/quantile band for beta
+pred_beta_right.caudate.beta$q_lo <- qBE(0.025, mu = pred_beta_right.caudate.beta$mu, sigma = pred_beta_right.caudate.beta$sigma)
+pred_beta_right.caudate.beta$q_hi <- qBE(0.975, mu = pred_beta_right.caudate.beta$mu, sigma = pred_beta_right.caudate.beta$sigma)
+
+### ±1 SD for beta
+pred_beta_right.caudate.beta$q_lo_1sd <- qBE(0.1586553, mu = pred_beta_right.caudate.beta$mu, sigma = pred_beta_right.caudate.beta$sigma)
+pred_beta_right.caudate.beta$q_hi_1sd <- qBE(0.8413447, mu = pred_beta_right.caudate.beta$mu, sigma = pred_beta_right.caudate.beta$sigma)
+
+
+### SD response
+plot_mod_right.caudate.beta_1sd<-ggplot(dat_kdv_control,aes(x=Age, y=right.caudate.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=right.caudate.prop,colour=Sex)) +
+  geom_line(data=pred_beta_right.caudate.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_right.caudate.beta, aes(ymin=q_lo_1sd, ymax=q_hi_1sd, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "right.caudate volume proportion")+
+  theme_minimal()
+
+
+plot_mod_right.caudate.beta_1sd+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+### 95% response: 95 % prediction / quantile band
+plot_mod_right.caudate.beta_95q<-ggplot(dat_kdv_control,aes(x=Age, y=right.caudate.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=right.caudate.prop,colour=Sex)) +
+  geom_line(data=pred_beta_right.caudate.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_right.caudate.beta, aes(ymin=q_lo, ymax=q_hi, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "right.caudate volume proportion")+
+  theme_minimal()
+
+
+plot_mod_right.caudate.beta_95q+
   theme(plot.title = element_text(size = 13,hjust=0.5), 
         axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
         axis.title.x = element_text(size=12),
@@ -538,6 +712,91 @@ plot_mod_left.hippocampus_95q+
         legend.text = element_text(size=11)) # update the formatting for the plot
 
 
+## left.hippocampus (beta)
+
+
+mod_left.hippocampus.beta <- gamlss(left.hippocampus.prop ~ fp(Age)*Sex,
+                                    sigma.formula = ~ fp(Age)*Sex,
+                                    family = BE, 
+                                    data = dat_kdv_control,
+                                    trace = FALSE,
+                                    control = gamlss.control(n.cyc = 200))
+summary(mod_left.hippocampus.beta)
+
+fittedPlot(mod_left.hippocampus.beta,x=dat_kdv_control$Age)
+
+
+## plot:
+
+### create a grid for predicted dataframe
+grid_left.hippocampus.beta <- expand.grid(
+  Age = seq(min(dat_kdv_control$Age, na.rm = TRUE),
+            max(dat_kdv_control$Age, na.rm = TRUE),
+            length.out = 200),
+  Sex = levels(dat_kdv_control$Sex)
+)
+
+### Predicted data
+pa_left.hippocampus.beta <- predictAll(mod_left.hippocampus.beta, newdata = grid_left.hippocampus.beta, type = "response")
+
+### Parameters for plotting
+pred_beta_left.hippocampus.beta <- data.frame(
+  Age      = grid_left.hippocampus.beta$Age,
+  Sex      = grid_left.hippocampus.beta$Sex,
+  mu       = as.numeric(pa_left.hippocampus.beta$mu),
+  sigma    = as.numeric(pa_left.hippocampus.beta$sigma)
+)
+
+### Add a calibrated 95% prediction/quantile band for beta
+pred_beta_left.hippocampus.beta$q_lo <- qBE(0.025, mu = pred_beta_left.hippocampus.beta$mu, sigma = pred_beta_left.hippocampus.beta$sigma)
+pred_beta_left.hippocampus.beta$q_hi <- qBE(0.975, mu = pred_beta_left.hippocampus.beta$mu, sigma = pred_beta_left.hippocampus.beta$sigma)
+
+### ±1 SD for beta
+pred_beta_left.hippocampus.beta$q_lo_1sd <- qBE(0.1586553, mu = pred_beta_left.hippocampus.beta$mu, sigma = pred_beta_left.hippocampus.beta$sigma)
+pred_beta_left.hippocampus.beta$q_hi_1sd <- qBE(0.8413447, mu = pred_beta_left.hippocampus.beta$mu, sigma = pred_beta_left.hippocampus.beta$sigma)
+
+
+### SD response
+plot_mod_left.hippocampus.beta_1sd<-ggplot(dat_kdv_control,aes(x=Age, y=left.hippocampus.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=left.hippocampus.prop,colour=Sex)) +
+  geom_line(data=pred_beta_left.hippocampus.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_left.hippocampus.beta, aes(ymin=q_lo_1sd, ymax=q_hi_1sd, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "left.hippocampus volume proportion")+
+  theme_minimal()
+
+
+plot_mod_left.hippocampus.beta_1sd+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+### 95% response: 95 % prediction / quantile band
+plot_mod_left.hippocampus.beta_95q<-ggplot(dat_kdv_control,aes(x=Age, y=left.hippocampus.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=left.hippocampus.prop,colour=Sex)) +
+  geom_line(data=pred_beta_left.hippocampus.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_left.hippocampus.beta, aes(ymin=q_lo, ymax=q_hi, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "left.hippocampus volume proportion")+
+  theme_minimal()
+
+
+plot_mod_left.hippocampus.beta_95q+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+
 
 ## right.hippocampus
 mod_right.hippocampus <- gamlss(right.hippocampus ~ fp(Age)*Sex,
@@ -617,6 +876,93 @@ plot_mod_right.hippocampus_95q+
         strip.text.x = element_text(size = 11),
         legend.title = element_text(size=12),
         legend.text = element_text(size=11)) # update the formatting for the plot
+
+
+
+## right.hippocampus (beta)
+
+
+mod_right.hippocampus.beta <- gamlss(right.hippocampus.prop ~ fp(Age)*Sex,
+                                     sigma.formula = ~ fp(Age)*Sex,
+                                     family = BE, 
+                                     data = dat_kdv_control,
+                                     trace = FALSE,
+                                     control = gamlss.control(n.cyc = 200))
+summary(mod_right.hippocampus.beta)
+
+fittedPlot(mod_right.hippocampus.beta,x=dat_kdv_control$Age)
+
+
+## plot:
+
+### create a grid for predicted dataframe
+grid_right.hippocampus.beta <- expand.grid(
+  Age = seq(min(dat_kdv_control$Age, na.rm = TRUE),
+            max(dat_kdv_control$Age, na.rm = TRUE),
+            length.out = 200),
+  Sex = levels(dat_kdv_control$Sex)
+)
+
+### Predicted data
+pa_right.hippocampus.beta <- predictAll(mod_right.hippocampus.beta, newdata = grid_right.hippocampus.beta, type = "response")
+
+### Parameters for plotting
+pred_beta_right.hippocampus.beta <- data.frame(
+  Age      = grid_right.hippocampus.beta$Age,
+  Sex      = grid_right.hippocampus.beta$Sex,
+  mu       = as.numeric(pa_right.hippocampus.beta$mu),
+  sigma    = as.numeric(pa_right.hippocampus.beta$sigma)
+)
+
+### Add a calibrated 95% prediction/quantile band for beta
+pred_beta_right.hippocampus.beta$q_lo <- qBE(0.025, mu = pred_beta_right.hippocampus.beta$mu, sigma = pred_beta_right.hippocampus.beta$sigma)
+pred_beta_right.hippocampus.beta$q_hi <- qBE(0.975, mu = pred_beta_right.hippocampus.beta$mu, sigma = pred_beta_right.hippocampus.beta$sigma)
+
+### ±1 SD for beta
+pred_beta_right.hippocampus.beta$q_lo_1sd <- qBE(0.1586553, mu = pred_beta_right.hippocampus.beta$mu, sigma = pred_beta_right.hippocampus.beta$sigma)
+pred_beta_right.hippocampus.beta$q_hi_1sd <- qBE(0.8413447, mu = pred_beta_right.hippocampus.beta$mu, sigma = pred_beta_right.hippocampus.beta$sigma)
+
+
+### SD response
+plot_mod_right.hippocampus.beta_1sd<-ggplot(dat_kdv_control,aes(x=Age, y=right.hippocampus.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=right.hippocampus.prop,colour=Sex)) +
+  geom_line(data=pred_beta_right.hippocampus.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_right.hippocampus.beta, aes(ymin=q_lo_1sd, ymax=q_hi_1sd, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "right.hippocampus volume proportion")+
+  theme_minimal()
+
+
+plot_mod_right.hippocampus.beta_1sd+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
+### 95% response: 95 % prediction / quantile band
+plot_mod_right.hippocampus.beta_1sd<-ggplot(dat_kdv_control,aes(x=Age, y=right.hippocampus.prop,colour=Sex,fill=Sex)) +
+  #geom_point(aes(colour=Sex)) +
+  geom_point(data=dat_kdv_patient,aes(x=Age,y=right.hippocampus.prop,colour=Sex)) +
+  geom_line(data=pred_beta_right.hippocampus.beta, aes(x=Age, y=mu,colour=Sex), size=.6) +
+  geom_ribbon(data=pred_beta_right.hippocampus.beta, aes(ymin=q_lo, ymax=q_hi, x=Age, y=mu,fill=Sex), alpha = 0.08) +# error band
+  scale_y_continuous(breaks = seq(0.0015, 0.0045, by = 0.0005),limits=c(0.0015, 0.0045))+
+  labs(x="Age", y = "right.hippocampus volume proportion")+
+  theme_minimal()
+
+
+plot_mod_right.hippocampus.beta_1sd+
+  theme(plot.title = element_text(size = 13,hjust=0.5), 
+        axis.text.x = element_text(size=11.5,angle = 0, hjust = 0.5),
+        axis.title.x = element_text(size=12),
+        axis.title.y = element_text(size=12),
+        strip.text.x = element_text(size = 11),
+        legend.title = element_text(size=12),
+        legend.text = element_text(size=11)) # update the formatting for the plot
+
 
 
 
